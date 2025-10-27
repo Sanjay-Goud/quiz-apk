@@ -8,6 +8,7 @@ import com.quiz.app.entity.Question;
 import com.quiz.app.entity.Quiz;
 import com.quiz.app.entity.QuizResult;
 import com.quiz.app.repository.CategoryRepository;
+import com.quiz.app.repository.QuestionRepository;
 import com.quiz.app.repository.QuizRepository;
 import com.quiz.app.repository.QuizResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class QuizService {
     @Autowired
     private QuizResultRepository quizResultRepository;
 
+    @Autowired
+    private QuestionRepository questionRepository;
+
     public Quiz createQuiz(String title, Long categoryId,
                            Question.Difficulty difficulty,
                            String createdBy,
@@ -39,7 +43,6 @@ public class QuizService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        // Get random questions based on category and difficulty
         List<Question> questions = questionService.getRandomQuestions(
                 categoryId, difficulty, numQuestions
         );
@@ -59,12 +62,10 @@ public class QuizService {
     }
 
     public List<Question> createCustomQuiz(CustomQuizRequest request) {
-        // Validate category exists
         if (!categoryRepository.existsById(request.getCategoryId())) {
             throw new RuntimeException("Category not found");
         }
 
-        // Get random questions
         List<Question> questions = questionService.getRandomQuestions(
                 request.getCategoryId(),
                 request.getDifficulty(),
@@ -105,7 +106,6 @@ public class QuizService {
         int score = 0;
         int totalQuestions = quiz.getQuestions().size();
 
-        // Calculate score
         for (Question question : quiz.getQuestions()) {
             String userAnswer = answers.get(question.getId());
             if (userAnswer != null && userAnswer.equals(question.getCorrectOption())) {
@@ -113,7 +113,6 @@ public class QuizService {
             }
         }
 
-        // Save result
         QuizResult result = new QuizResult();
         result.setUserId(submission.getUserId());
         result.setQuizId(submission.getQuizId());
@@ -123,10 +122,56 @@ public class QuizService {
 
         QuizResult savedResult = quizResultRepository.save(result);
 
-        // Calculate percentage
         double percentage = (score * 100.0) / totalQuestions;
+        String message = getPerformanceMessage(percentage);
 
-        // Generate message based on performance
+        return new QuizResultResponse(
+                savedResult.getId(),
+                score,
+                totalQuestions,
+                percentage,
+                message
+        );
+    }
+
+    // NEW: Method to handle custom quiz submissions (without saving quiz)
+    public QuizResultResponse submitCustomQuiz(QuizSubmission submission) {
+        Map<Long, String> answers = submission.getAnswers();
+
+        if (answers == null || answers.isEmpty()) {
+            throw new RuntimeException("No answers provided");
+        }
+
+        // Fetch all questions from the submission
+        List<Long> questionIds = answers.keySet().stream().toList();
+        List<Question> questions = questionRepository.findAllById(questionIds);
+
+        if (questions.isEmpty()) {
+            throw new RuntimeException("Questions not found");
+        }
+
+        int score = 0;
+        int totalQuestions = questions.size();
+
+        // Calculate score
+        for (Question question : questions) {
+            String userAnswer = answers.get(question.getId());
+            if (userAnswer != null && userAnswer.equals(question.getCorrectOption())) {
+                score++;
+            }
+        }
+
+        // Save result with quizId as null for custom quizzes
+        QuizResult result = new QuizResult();
+        result.setUserId(submission.getUserId());
+        result.setQuizId(null);  // Custom quiz doesn't have a quiz ID
+        result.setScore(score);
+        result.setTotalQuestions(totalQuestions);
+        result.setTimestamp(LocalDateTime.now());
+
+        QuizResult savedResult = quizResultRepository.save(result);
+
+        double percentage = (score * 100.0) / totalQuestions;
         String message = getPerformanceMessage(percentage);
 
         return new QuizResultResponse(

@@ -948,14 +948,32 @@
     }
 
     async function submitQuiz() {
-        if (Object.keys(userAnswers).length < currentQuestions.length) {
-            if (!confirm('You haven\'t answered all questions. Submit anyway?')) {
-                return;
-            }
+    if (Object.keys(userAnswers).length < currentQuestions.length) {
+        if (!confirm('You haven\'t answered all questions. Submit anyway?')) {
+            return;
         }
+    }
 
-        try {
-            const response = await fetch(`${API_URL}/quiz/submit/${currentQuizId || 0}`, {
+    try {
+        let response;
+
+        // Check if it's a custom quiz (no quizId) or a saved quiz
+        if (currentQuizId === null) {
+            // Custom quiz submission
+            response = await fetch(`${API_URL}/quiz/submit/custom`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentUser.token}`
+                },
+                body: JSON.stringify({
+                    userId: parseInt(currentUser.userId),
+                    answers: userAnswers
+                })
+            });
+        } else {
+            // Saved quiz submission
+            response = await fetch(`${API_URL}/quiz/submit/${currentQuizId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -967,17 +985,20 @@
                     answers: userAnswers
                 })
             });
-
-            if (response.ok) {
-                const result = await response.json();
-                displayResults(result);
-            } else {
-                alert('Failed to submit quiz');
-            }
-        } catch (error) {
-            alert('Network error. Please try again.');
         }
+
+        if (response.ok) {
+            const result = await response.json();
+            displayResults(result);
+        } else {
+            const errorData = await response.json();
+            alert('Failed to submit quiz: ' + (errorData.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Submit quiz error:', error);
+        alert('Network error. Please try again.');
     }
+}
 
     function displayResults(result) {
         document.getElementById('scoreCircle').textContent = `${result.score}/${result.totalQuestions}`;

@@ -16,7 +16,7 @@ public class QuizResult {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)  // Changed to allow null for custom quizzes
     private Long quizId;
 
     @Column(nullable = false)

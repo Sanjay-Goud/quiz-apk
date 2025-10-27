@@ -80,6 +80,7 @@ public class QuizController {
         return ResponseEntity.ok(quizService.getQuizzesByCategory(categoryId));
     }
 
+    // Fixed endpoint to handle both quiz ID and custom quiz submissions
     @PostMapping("/submit/{quizId}")
     public ResponseEntity<?> submitQuiz(
             @PathVariable Long quizId,
@@ -87,6 +88,19 @@ public class QuizController {
         try {
             submission.setQuizId(quizId);
             QuizResultResponse result = quizService.submitQuiz(submission);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    // NEW: Separate endpoint for custom quiz submission
+    @PostMapping("/submit/custom")
+    public ResponseEntity<?> submitCustomQuiz(@RequestBody QuizSubmission submission) {
+        try {
+            QuizResultResponse result = quizService.submitCustomQuiz(submission);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
