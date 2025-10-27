@@ -1096,13 +1096,11 @@
         await loadCategoriesTable();
     }
 
-
-     async function loadCategoriesTable() {
+    async function loadCategoriesTable() {
     try {
         const response = await fetch(`${API_URL}/category/all`);
         const categories = await response.json();
 
-        // Get question counts for each category
         const categoriesWithCounts = await Promise.all(
             categories.map(async (cat) => {
                 try {
@@ -1139,10 +1137,10 @@
                             </td>
                             <td>
                                 ${cat.questionCount > 0
-                                    ? `<button class="btn btn-secondary" style="padding: 0.5rem 1rem;" onclick="viewCategoryQuestions(${cat.id})">View Questions</button>
-                                       <button class="btn btn-danger" style="padding: 0.5rem 1rem; opacity: 0.5; cursor: not-allowed;" disabled title="Delete questions first">Delete</button>`
-                                    : `<button class="btn btn-danger" onclick="deleteCategory(${cat.id})">Delete</button>`
+                                    ? `<button class="btn btn-secondary" style="padding: 0.5rem 1rem;" onclick="viewCategoryQuestions(${cat.id})">View Questions</button>`
+                                    : ''
                                 }
+                                <button class="btn btn-danger" onclick="deleteCategoryWithConfirm(${cat.id}, '${cat.name}', ${cat.questionCount})">Delete</button>
                             </td>
                         </tr>
                     `).join('')}
@@ -1154,6 +1152,32 @@
     }
 }
 
+
+     async function deleteCategoryWithConfirm(id, name, questionCount) {
+    const message = questionCount > 0
+        ? `Delete "${name}" and all ${questionCount} question(s) in it?`
+        : `Delete category "${name}"?`;
+
+    if (!confirm(message + '\n\nThis action cannot be undone.')) return;
+
+    try {
+        const response = await fetch(`${API_URL}/category/delete/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+
+        if (response.ok) {
+            loadCategoriesTable();
+            loadCategories();
+            alert(`Category "${name}" deleted successfully`);
+        } else {
+            const error = await response.json();
+            alert(error.error || 'Failed to delete category');
+        }
+    } catch (error) {
+        alert('Network error. Please try again.');
+    }
+}
 
      async function viewCategoryQuestions(categoryId) {
         try {
