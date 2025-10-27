@@ -601,7 +601,9 @@
 </div>
 
 <script>
-    const API_URL = 'http://localhost:8080';
+    const API_URL = window.location.hostname === 'localhost'
+       ? 'http://localhost:8080'
+       : window.location.origin;
     let currentUser = null;
     let currentQuestions = [];
     let userAnswers = {};

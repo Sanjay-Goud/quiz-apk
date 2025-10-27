@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: quiz-app
+    runtime: java
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/quiz-application-1.0.0.jar
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: quiz-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: 86400000
+      - key: CORS_ORIGINS
+        sync: false
+    healthCheckPath: /actuator/health
+
+databases:
+  - name: quiz-db
+    databaseName: quizdb
+    user: quizuser
