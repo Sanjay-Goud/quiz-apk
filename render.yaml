@@ -1,14 +1,12 @@
 services:
   - type: web
     name: quiz-app
-    runtime: java
+    env: java
     buildCommand: ./mvnw clean package -DskipTests
     startCommand: java -jar target/quiz-application-1.0.0.jar
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: quiz-db
-          property: connectionString
+        value: postgresql://neondb_owner:npg_pgjen2uM7SWJ@ep-delicate-dream-a1jgbc9s-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRATION
@@ -16,8 +14,3 @@ services:
       - key: CORS_ORIGINS
         sync: false
     healthCheckPath: /actuator/health
-
-databases:
-  - name: quiz-db
-    databaseName: quizdb
-    user: quizuser
