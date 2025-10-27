@@ -13,8 +13,8 @@ RUN chmod +x mvnw
 # Copy source code
 COPY src src
 
-# Build application
-RUN ./mvnw clean package -DskipTests
+# Build application (skip test compilation)
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-jammy
