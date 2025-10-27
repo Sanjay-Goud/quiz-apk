@@ -2,10 +2,13 @@ package com.quiz.app.service;
 
 import com.quiz.app.entity.Category;
 import com.quiz.app.entity.Question;
+import com.quiz.app.entity.Quiz;
 import com.quiz.app.repository.CategoryRepository;
 import com.quiz.app.repository.QuestionRepository;
+import com.quiz.app.repository.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +20,9 @@ public class QuestionService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
 
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();
@@ -70,10 +76,24 @@ public class QuestionService {
         return questionRepository.save(existingQuestion);
     }
 
+    @Transactional
     public void deleteQuestion(Long id) {
         if (!questionRepository.existsById(id)) {
             throw new RuntimeException("Question not found with id: " + id);
         }
+
+        // Remove question from all quizzes that contain it
+        List<Quiz> quizzes = quizRepository.findAll();
+        boolean removedFromQuizzes = false;
+
+        for (Quiz quiz : quizzes) {
+            if (quiz.getQuestions().removeIf(q -> q.getId().equals(id))) {
+                quizRepository.save(quiz);
+                removedFromQuizzes = true;
+            }
+        }
+
+        // Now safe to delete the question
         questionRepository.deleteById(id);
     }
 
