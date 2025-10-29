@@ -348,56 +348,20 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .navbar {
-                padding: 0.75rem 1rem;
-            }
-
-            .nav-content {
-                flex-direction: column;
+            .nav-links {
                 gap: 1rem;
             }
 
-            .logo {
-                font-size: 1.25rem;
-            }
-
-            .nav-links {
-                gap: 0.75rem;
-                font-size: 0.9rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
             .container {
-                padding: 0 0.75rem;
-                margin: 1rem auto;
-            }
-
-            .card {
-                padding: 1.25rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .card-title {
-                font-size: 1.25rem;
+                padding: 0 0.5rem;
             }
 
             .grid {
                 grid-template-columns: 1fr;
-                gap: 1rem;
             }
 
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-
-            .stat-value {
-                font-size: 1.5rem;
-            }
-
-            .stat-label {
-                font-size: 0.875rem;
+                grid-template-columns: 1fr;
             }
 
             .result-actions {
@@ -406,142 +370,6 @@
 
             .result-actions .btn {
                 width: 100%;
-            }
-
-            .form-group {
-                margin-bottom: 1rem;
-            }
-
-            .form-input, .form-select {
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-
-            .btn {
-                padding: 0.625rem 1.25rem;
-                font-size: 0.95rem;
-            }
-
-            .question-card {
-                padding: 1.25rem;
-            }
-
-            .question-title {
-                font-size: 1.1rem;
-            }
-
-            .option {
-                padding: 0.875rem;
-                font-size: 0.95rem;
-            }
-
-            .score-circle {
-                width: 120px;
-                height: 120px;
-                font-size: 1.75rem;
-            }
-
-            .performance-message {
-                font-size: 1.1rem;
-            }
-
-            .table {
-                font-size: 0.875rem;
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-
-            .table th, .table td {
-                padding: 0.75rem 0.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .navbar {
-                padding: 0.5rem 0.75rem;
-            }
-
-            .logo {
-                font-size: 1.125rem;
-            }
-
-            .nav-links {
-                gap: 0.5rem;
-                font-size: 0.85rem;
-            }
-
-            .container {
-                padding: 0 0.5rem;
-            }
-
-            .card {
-                padding: 1rem;
-                border-radius: 6px;
-            }
-
-            .card-title {
-                font-size: 1.125rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-input, .form-select, .btn {
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-
-            .btn {
-                padding: 0.5rem 1rem;
-            }
-
-            .question-card {
-                padding: 1rem;
-            }
-
-            .question-title {
-                font-size: 1rem;
-            }
-
-            .option {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-            }
-
-            .score-circle {
-                width: 100px;
-                height: 100px;
-                font-size: 1.5rem;
-            }
-
-            .performance-message {
-                font-size: 1rem;
-            }
-
-            .result-summary h2 {
-                font-size: 1.25rem;
-            }
-        }
-
-        /* Landscape orientation fixes for mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .navbar {
-                padding: 0.5rem 1rem;
-            }
-
-            .container {
-                margin: 0.5rem auto;
-            }
-
-            .card {
-                padding: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            .score-circle {
-                width: 80px;
-                height: 80px;
-                font-size: 1.25rem;
             }
         }
     </style>
@@ -762,12 +590,50 @@
                 </form>
             </div>
 
+            <!-- Create Quiz -->
+            <div class="card">
+                <h3>Create Quiz</h3>
+                <form onsubmit="createQuiz(event)">
+                    <div class="form-group">
+                        <label class="form-label">Quiz Title</label>
+                        <input type="text" id="adminQuizTitle" class="form-input" placeholder="e.g., JavaScript Fundamentals Quiz" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select id="quizCategoryAdmin" class="form-select" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Difficulty</label>
+                            <select id="quizDifficultyAdmin" class="form-select" required>
+                                <option value="EASY">Easy</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HARD">Hard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Number of Questions</label>
+                            <input type="number" id="quizNumQuestions" class="form-input" min="1" max="50" value="10" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Quiz</button>
+                </form>
+            </div>
+
+            <!-- View All Quizzes -->
+            <div class="card">
+                <h3>All Quizzes</h3>
+                <button class="btn btn-secondary" onclick="loadAllQuizzes()">Load Quizzes</button>
+                <div id="allQuizzes"></div>
+            </div>
+
             <!-- View All Results -->
             <div class="card">
-                <h3>All Results</h3>
+                <h3>All Quiz Results</h3>
                 <button class="btn btn-secondary" onclick="loadAllResults()">Load Results</button>
                 <div id="allResults"></div>
             </div>
+
         </div>
     </div>
 </div>
@@ -1268,6 +1134,7 @@
     async function loadAdminData() {
         await loadCategories();
         await loadCategoriesTable();
+        await loadAdminQuizCategories();
     }
 
     async function loadCategoriesTable() {
@@ -1323,6 +1190,138 @@
         `;
     } catch (error) {
         console.error('Error loading categories:', error);
+    }
+}
+
+    async function loadAdminQuizCategories() {
+    try {
+        const response = await fetch(`${API_URL}/category/all`);
+        const categories = await response.json();
+
+        const select = document.getElementById('quizCategoryAdmin');
+        if (select) {
+            select.innerHTML = '<option value="">Select Category</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading admin quiz categories:', error);
+    }
+}
+
+async function createQuiz(event) {
+    event.preventDefault();
+
+    const title = document.getElementById('adminQuizTitle').value;
+    const categoryId = document.getElementById('quizCategoryAdmin').value;
+    const difficulty = document.getElementById('quizDifficultyAdmin').value;
+    const numQuestions = document.getElementById('quizNumQuestions').value;
+
+    try {
+        const response = await fetch(`${API_URL}/quiz/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentUser.token}`
+            },
+            body: JSON.stringify({
+                title,
+                categoryId: parseInt(categoryId),
+                difficulty,
+                createdBy: currentUser.username,
+                numQuestions: parseInt(numQuestions)
+            })
+        });
+
+        if (response.ok) {
+            event.target.reset();
+            alert('Quiz created successfully!');
+            loadAllQuizzes(); // Refresh quiz list
+        } else {
+            const error = await response.json();
+            alert(error.error || 'Failed to create quiz');
+        }
+    } catch (error) {
+        console.error('Error creating quiz:', error);
+        alert('Network error. Please try again.');
+    }
+}
+
+    async function loadAllQuizzes() {
+    try {
+        const response = await fetch(`${API_URL}/quiz/all`, {
+            headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        const quizzes = await response.json();
+
+        if (quizzes.length === 0) {
+            document.getElementById('allQuizzes').innerHTML = '<p style="margin-top: 1rem;">No quizzes created yet.</p>';
+            return;
+        }
+
+        document.getElementById('allQuizzes').innerHTML = `
+            <table class="table" style="margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Difficulty</th>
+                        <th>Questions</th>
+                        <th>Created By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${quizzes.map(quiz => `
+                        <tr>
+                            <td>${quiz.id}</td>
+                            <td>${quiz.title}</td>
+                            <td>${quiz.category.name}</td>
+                            <td>
+                                <span style="padding: 0.25rem 0.75rem; background: var(--primary-color); color: white; border-radius: 12px; font-size: 0.875rem;">
+                                    ${quiz.difficulty}
+                                </span>
+                            </td>
+                            <td>${quiz.questions.length}</td>
+                            <td>${quiz.createdBy}</td>
+                            <td>
+                                <button class="btn btn-danger" style="padding: 0.5rem 1rem;" onclick="deleteQuiz(${quiz.id}, '${quiz.title}')">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    } catch (error) {
+        console.error('Error loading quizzes:', error);
+        alert('Failed to load quizzes');
+    }
+}
+
+   async function deleteQuiz(quizId, quizTitle) {
+    if (!confirm(`Delete quiz "${quizTitle}"?\n\nThis action cannot be undone.`)) return;
+
+    try {
+        const response = await fetch(`${API_URL}/quiz/delete/${quizId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+
+        if (response.ok) {
+            alert('Quiz deleted successfully');
+            loadAllQuizzes(); // Refresh the quiz list
+        } else {
+            const error = await response.json();
+            alert(error.error || 'Failed to delete quiz');
+        }
+    } catch (error) {
+        console.error('Error deleting quiz:', error);
+        alert('Network error. Please try again.');
     }
 }
 
