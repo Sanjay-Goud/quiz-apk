@@ -836,6 +836,21 @@
         loadCategories();
     });
 
+    // Loading spinner utility functions
+    function showSpinner(containerId) {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = '<div class="spinner"></div>';
+        }
+    }
+
+    function hideSpinner(containerId) {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = '';
+        }
+    }
+
     // Auth Functions
     function checkAuth() {
         const token = localStorage.getItem('token');
